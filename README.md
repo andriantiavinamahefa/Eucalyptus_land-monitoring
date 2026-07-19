@@ -1,2 +1,2 @@
 # Eucalyptus_land-monitoring
-This repo reports my training in Land monitoring. For this case, i assess the evolution of our Eucalyptus land over years from 2021-2026 using Google Earth Engine and Python 
+This repo reports my training in Land monitoring. For this case, i assess the evolution of our Eucalyptus land over years from 2021-2026 using Google Earth Engine (the scrpit is below in the file script used in GEE). After having the dataset accross the time range, the data has been exported in drive to be used in python after (script is below in the file) 
