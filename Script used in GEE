@@ -4,7 +4,7 @@ var ricePolygon = geometry;  // auto-created when you draw
 // 2. Load Sentinel-2
 var s2 = ee.ImageCollection("COPERNICUS/S2_SR")
             .filterBounds(ricePolygon)
-            .filterDate('2021-01-01', '2022-12-01')
+            .filterDate('2021-01-01', '2026-05-01')
             .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 20));
 
 // 3. Compute NDVI
