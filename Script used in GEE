@@ -1,0 +1,81 @@
+// 1. Use the polygon of our Euclayptus land
+var ricePolygon = geometry;  // auto-created when you draw
+
+// 2. Load Sentinel-2
+var s2 = ee.ImageCollection("COPERNICUS/S2_SR")
+            .filterBounds(ricePolygon)
+            .filterDate('2021-01-01', '2022-12-01')
+            .filter(ee.Filter.lt('CLOUDY_PIXEL_PERCENTAGE', 20));
+
+// 3. Compute NDVI
+var withNDVI = s2.map(function(img) {
+  var ndvi = img.normalizedDifference(['B8','B4']).rename('NDVI');
+  return ndvi.copyProperties(img, ['system:time_start']);
+});
+
+// 4. Clip NDVI to polygon
+var clippedNDVI = withNDVI.map(function(img){
+  return img.clip(ricePolygon);
+});
+
+// ------------------------------
+// A. Create monthly NDVI composites across years
+// ------------------------------
+var years = ee.List.sequence(2021, 2022);
+var months = ee.List.sequence(1, 12);
+
+var yearMonthNDVI = ee.ImageCollection(
+  years.map(function(y) {
+    return months.map(function(m) {
+      var monthly = clippedNDVI
+        .filter(ee.Filter.calendarRange(y, y, 'year'))
+        .filter(ee.Filter.calendarRange(m, m, 'month'))
+        .mean();
+      return monthly.set({'year': y, 'month': m});
+    });
+  }).flatten()
+);
+
+// ------------------------------
+// B. Display NDVI images by year+month
+// ------------------------------
+yearMonthNDVI.evaluate(function(list) {
+  list.features.forEach(function(f) {
+    var year = f.properties.year;
+    var month = f.properties.month;
+    var img = ee.Image(f.id);
+    Map.addLayer(img,
+      {min:0, max:1, palette:['blue','white','green']},
+      'NDVI ' + year + '-' + month);
+  });
+});
+
+// ------------------------------
+// C. Add NDVI Legend to Map
+// ------------------------------
+var legend = ui.Panel({style: {position: 'bottom-left'}});
+legend.add(ui.Label('NDVI Legend'));
+legend.add(ui.Label('Blue = Low NDVI (water/bare soil)'));
+legend.add(ui.Label('White = Medium NDVI'));
+legend.add(ui.Label('Green = High NDVI (dense vegetation)'));
+Map.add(legend);
+
+// ------------------------------
+// D. Export each monthly NDVI composite to Google Drive
+// ------------------------------
+years.getInfo().forEach(function(y) {
+  months.getInfo().forEach(function(m) {
+    var monthly = clippedNDVI
+      .filter(ee.Filter.calendarRange(y, y, 'year'))
+      .filter(ee.Filter.calendarRange(m, m, 'month'))
+      .mean();
+    Export.image.toDrive({
+      image: monthly,
+      description: 'NDVI_' + y + '_' + m,
+      folder: 'NDVI_Exports',
+      region: ricePolygon,
+      scale: 10,
+      maxPixels: 1e13
+    });
+  });
+});
