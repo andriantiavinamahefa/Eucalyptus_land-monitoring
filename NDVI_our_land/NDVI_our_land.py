@@ -1,0 +1,46 @@
+import matplotlib.pyplot as plt
+import rasterio
+import numpy as np
+import glob
+import os
+
+# 1️⃣ Load all exported NDVI GeoTIFFs
+# Make sure your files are named like NDVI_2023_1.tif ... NDVI_2026_6.tif
+files = sorted(glob.glob("NDVI_Exports/NDVI_*.tif"))
+
+# 2️⃣ Create subplot grid (adjust automatically based on number of files)
+n_files = len(files)
+n_cols = 6   # 6 columns (Jan–Jun fits neatly)
+n_rows = int(np.ceil(n_files / n_cols))
+
+fig, axes = plt.subplots(n_rows, n_cols, figsize=(18, 10))
+axes = axes.flatten()
+
+# 3️⃣ Plot each NDVI file
+for i, ax in enumerate(axes):
+    if i < n_files:
+        with rasterio.open(files[i]) as src:
+            ndvi = src.read(1)
+            ndvi = np.ma.masked_where(ndvi == src.nodata, ndvi)
+            im = ax.imshow(ndvi, cmap="RdYlGn", vmin=0, vmax=1)
+
+            # Extract year and month from filename
+            fname = os.path.basename(files[i])
+            parts = fname.replace(".tif", "").split("_")
+            year, month = parts[1], parts[2]
+            ax.set_title(f"{year}-{month.zfill(2)}", fontsize=9)
+            ax.axis("off")
+    else:
+        ax.axis("off")
+
+# 4️⃣ Add shared colorbar (legend)
+cbar_ax = fig.add_axes([0.25, 0.08, 0.5, 0.02])
+fig.colorbar(im, cax=cbar_ax, orientation="horizontal", label="NDVI Scale (Low → High)")
+
+# 5️⃣ Add main title
+plt.suptitle("NDVI Evolution (2023–2026)", fontsize=16)
+plt.tight_layout(rect=[0, 0.1, 1, 0.95])
+
+# 6️⃣ Save or show figure
+plt.savefig("NDVI_Evolution_2023_2026.png", dpi=300)
+plt.show()
