@@ -1,2 +1,37 @@
-# Eucalyptus_land-monitoring
-This repo reports my training in Land monitoring. For this case, i assess the evolution of an Eucalyptus land over years from 2021-2026 using Google Earth Engine and Sentinel-2 images(the scrpit is below " script used in GEE") . After having the dataset accross the time range, the data has been exported in drive to be used in python after (script is below in the file named script named "Script used to generate the evolution of NDVI..."). The file NDVI_our_land is the entire dataset. The ndvi_evolution.png shows the final result, indicating that the highest NDVI we have got was back on April 2021. After that, deforestation has been heavily practiced almost each year leading to growth limitation.   
+Land Monitoring Training Project
+This repository documents my training in land monitoring using Google Earth Engine (GEE) and Python.
+The case study focuses on assessing the evolution of an Eucalyptus plantation from 2021 to 2026 using Sentinel‑2 imagery.
+Workflow
+Data Collection (GEE)
+
+Sentinel‑2 images were processed in Google Earth Engine.
+
+NDVI was computed across the time range 2021–2026.
+
+Script: see file “Script used in GEE”.
+
+Data Export
+
+The NDVI dataset was exported to Google Drive for further analysis.
+
+File: NDVI_our_land (entire dataset).
+
+Python Analysis
+
+The exported dataset was processed in Python to generate NDVI evolution trends.
+
+Script: see file “Script used to generate the evolution of NDVI…”.
+
+Visualization
+
+Final output: ndvi_evolution.png.
+
+This figure shows that the highest NDVI occurred in April 2021.
+
+After 2021, deforestation activities were observed almost every year, leading to growth limitations.
+Results
+Peak vegetation health: April 2021.
+
+Continuous decline in NDVI values due to deforestation pressure.
+
+Demonstrates how remote sensing can be used to monitor land use change and vegetation dynamics over time.
